@@ -1,0 +1,11 @@
+{
+	"id": "meu-vault",
+	"name": "Meu vault",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Customizações para o meu vault no obsidian",
+	"author": "Marcos Josué",
+	"authorUrl": "https://github.com/MarcosMiraco",
+	"fundingUrl": "https://obsidian.md/pricing",
+	"isDesktopOnly": false
+}
