@@ -55,6 +55,22 @@ export const themes: theme[] = [
         glassColor: GLOBAL_COLORS.glass.green
     },
     {
+        name: "teal",
+        defaultColor: GLOBAL_COLORS.default.teal,
+        textPrimaryColor: GLOBAL_COLORS.default.white,
+        textSecondaryColor: GLOBAL_COLORS.default.white,
+        gradientEndColor: GLOBAL_COLORS.gradientEnd.teal,
+        markerDefaultColor: GLOBAL_COLORS.darker.teal,
+        mutedColor: GLOBAL_COLORS.muted.teal,
+        lighterColor: GLOBAL_COLORS.lighter.teal,
+        darkerColor: GLOBAL_COLORS.darker.teal,
+        darkestColor: GLOBAL_COLORS.darkest.teal,
+        transparentColor: GLOBAL_COLORS.transparent.teal,
+        highlightColor: GLOBAL_COLORS.highlight.teal,
+        contrastColor: GLOBAL_COLORS.contrast.teal,
+        glassColor: GLOBAL_COLORS.glass.teal
+    },
+    {
         name: "blue",
         defaultColor: GLOBAL_COLORS.default.blue,
         textPrimaryColor: GLOBAL_COLORS.default.white,
@@ -103,6 +119,22 @@ export const themes: theme[] = [
         highlightColor: GLOBAL_COLORS.highlight.purple,
         contrastColor: GLOBAL_COLORS.contrast.purple,
         glassColor: GLOBAL_COLORS.glass.purple
+    },
+    {
+        name: "indigo",
+        defaultColor: GLOBAL_COLORS.default.indigo,
+        textPrimaryColor: GLOBAL_COLORS.default.white,
+        textSecondaryColor: GLOBAL_COLORS.default.white,
+        gradientEndColor: GLOBAL_COLORS.gradientEnd.indigo,
+        markerDefaultColor: GLOBAL_COLORS.darker.indigo,
+        mutedColor: GLOBAL_COLORS.muted.indigo,
+        lighterColor: GLOBAL_COLORS.lighter.indigo,
+        darkerColor: GLOBAL_COLORS.darker.indigo,
+        darkestColor: GLOBAL_COLORS.darkest.indigo,
+        transparentColor: GLOBAL_COLORS.transparent.indigo,
+        highlightColor: GLOBAL_COLORS.highlight.indigo,
+        contrastColor: GLOBAL_COLORS.contrast.indigo,
+        glassColor: GLOBAL_COLORS.glass.indigo
     },
     {
         name: "orange",
@@ -167,6 +199,38 @@ export const themes: theme[] = [
         highlightColor: GLOBAL_COLORS.highlight.gray,
         contrastColor: GLOBAL_COLORS.contrast.gray,
         glassColor: GLOBAL_COLORS.glass.gray
+    },
+    {
+        name: "slate",
+        defaultColor: GLOBAL_COLORS.default.slate,
+        textPrimaryColor: GLOBAL_COLORS.default.white,
+        textSecondaryColor: GLOBAL_COLORS.default.white,
+        gradientEndColor: GLOBAL_COLORS.gradientEnd.slate,
+        markerDefaultColor: GLOBAL_COLORS.darker.slate,
+        mutedColor: GLOBAL_COLORS.muted.slate,
+        lighterColor: GLOBAL_COLORS.lighter.slate,
+        darkerColor: GLOBAL_COLORS.darker.slate,
+        darkestColor: GLOBAL_COLORS.darkest.slate,
+        transparentColor: GLOBAL_COLORS.transparent.slate,
+        highlightColor: GLOBAL_COLORS.highlight.slate,
+        contrastColor: GLOBAL_COLORS.contrast.slate,
+        glassColor: GLOBAL_COLORS.glass.slate
+    },
+    {
+        name: "sepia",
+        defaultColor: GLOBAL_COLORS.default.sepia,
+        textPrimaryColor: GLOBAL_COLORS.default.white,
+        textSecondaryColor: GLOBAL_COLORS.default.white,
+        gradientEndColor: GLOBAL_COLORS.gradientEnd.sepia,
+        markerDefaultColor: GLOBAL_COLORS.darker.sepia,
+        mutedColor: GLOBAL_COLORS.muted.sepia,
+        lighterColor: GLOBAL_COLORS.lighter.sepia,
+        darkerColor: GLOBAL_COLORS.darker.sepia,
+        darkestColor: GLOBAL_COLORS.darkest.sepia,
+        transparentColor: GLOBAL_COLORS.transparent.sepia,
+        highlightColor: GLOBAL_COLORS.highlight.sepia,
+        contrastColor: GLOBAL_COLORS.contrast.sepia,
+        glassColor: GLOBAL_COLORS.glass.sepia
     },
     {
         name: "white",
