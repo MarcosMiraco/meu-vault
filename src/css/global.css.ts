@@ -18,7 +18,7 @@ export const GLOBAL_COLORS = {
         indigo: "#6610f2",
         cyan: "#17a2b8",
         orange: "#fd7e14",
-        pink: "#e83e8c",
+        pink: "#e83e8c",    
         gray: "#6c757d",
         slate: "#475569",
         sepia: "#704214"

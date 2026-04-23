@@ -55,6 +55,20 @@ globalStyle(`.callout[data-callout-metadata*="horizontal"][data-callout=${baseCa
     }
 })
 
+globalStyle(`.callout[data-callout-metadata*="grad"][data-callout=${baseCallout}]`, {
+    background: `
+        linear-gradient(transparent, transparent) padding-box,
+        linear-gradient(var(--degre), var(--window-border-color) 0%, var(--gradient-end-color) 100%) border-box
+    `,
+    borderRadius: "5px",
+    border: "2px solid transparent"
+})
+
+globalStyle(`.callout[data-callout-metadata*="grad"][data-callout=${baseCallout}] :is(.callout-title)`, {
+    backgroundImage: `linear-gradient(var(--degre), var(--window-title-bg-color) 0%, var(--gradient-end-color) 100%)`,
+    backgroundColor: "transparent"
+})
+
 for (const style of themes) {
     const borderColor = style.defaultColor ?? defaultTheme.defaultColor;
     const titleBgColor = style.defaultColor ?? defaultTheme.defaultColor;
@@ -75,28 +89,21 @@ for (const style of themes) {
             "--window-content-bg-color": contentBgColor,
             "--window-content-text-color": contentFontColor,
             "--gradient-end-color": gradientEndColor
-        },
-        borderColor: borderColor
-    })
-
-    globalStyle(`.callout[data-callout-metadata*=${style.name}][data-callout-metadata*="grad"][data-callout=${baseCallout}]`, {
-        background: `
-            linear-gradient(transparent, transparent) padding-box,
-            linear-gradient(var(--degre), var(--window-border-color) 0%, var(--gradient-end-color) 100%) border-box
-        `,
-        borderRadius: "5px",
-        border: "2px solid transparent"
-    })
-
-    globalStyle(`.callout[data-callout-metadata*=${style.name}][data-callout-metadata*="grad"][data-callout=${baseCallout}] :is(.callout-title)`, {
-        backgroundImage: `linear-gradient(var(--degre), var(--window-title-bg-color) 0%, var(--gradient-end-color) 100%)`,
-        backgroundColor: "transparent"
-    })
-
-    globalStyle(`.callout[data-callout-metadata*=${style.name}][data-callout-metadata*="transparent"][data-callout=${baseCallout}]`, {
-        vars: {
-            "--window-title-bg-color": "transparent",
-            "--window-content-bg-color": "transparent",
         }
     })
 }
+
+globalStyle(`.callout[data-callout-metadata*="transparent"][data-callout=${baseCallout}]`, {
+    vars: {
+        "--window-title-bg-color": "transparent",
+        "--window-content-bg-color": "transparent",
+    }
+})
+
+globalStyle(`.callout[data-callout-metadata*="grad"][data-callout-metadata*="transparent"][data-callout=${baseCallout}]`, {
+    backgroundImage: `linear-gradient(var(--degre), var(--window-border-color) 0%, var(--gradient-end-color) 100%)`
+})
+
+globalStyle(`.callout[data-callout-metadata*="grad"][data-callout-metadata*="transparent"][data-callout=${baseCallout}] :is(.callout-title)`, {
+    backgroundImage: "none"
+})
