@@ -4,12 +4,16 @@ import { GLOBAL_COLORS } from "../css/global.css";
 
 
 export interface MeuPluginSettings {
+    updateCssClassesOnStatusChange: boolean;
+
     coloredFoldersLegacy: boolean;
     coloredFoldersEnhancedColors: { prefix: string; color: string }[];
     coloredFoldersLegacyColors: { prefix: string; color: string }[];
 }
 
 export const DEFAULT_SETTINGS: MeuPluginSettings = {
+    updateCssClassesOnStatusChange: false,
+
     coloredFoldersLegacy: false,
     coloredFoldersEnhancedColors: [
         { prefix: "01", color: GLOBAL_COLORS.darker.gray },
@@ -43,6 +47,17 @@ export class MeuVaultSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
+
+        containerEl.createEl('h2', { text: 'Status Themes' });
+        new Setting(containerEl)
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.updateCssClassesOnStatusChange)
+                .onChange(async (value) => {
+                    this.plugin.settings.updateCssClassesOnStatusChange = value;
+                    await this.plugin.saveSettings();
+                })
+            )
+            .setName("Update CSS Classes on Status Change");
 
         containerEl.createEl('h2', { text: 'Colored Folders' });
         new Setting(containerEl)

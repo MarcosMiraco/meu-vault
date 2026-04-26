@@ -1,7 +1,7 @@
 {
 	"id": "meu-vault",
 	"name": "Meu vault",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Customizações para o meu vault no obsidian",
 	"author": "Marcos Josué",

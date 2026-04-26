@@ -91,6 +91,8 @@ export default class MeuPlugin extends Plugin {
 	}
 
 	onStatusUpdate(file: import("obsidian").TFile) {
+		if (!this.settings.updateCssClassesOnStatusChange) return;
+
 		const cache = this.app.metadataCache.getFileCache(file);
 		if (!cache?.frontmatter) return;
 
