@@ -1,5 +1,5 @@
 import { globalStyle } from "@vanilla-extract/css";
-import { statusThemes } from "./themes";
+import { statusThemes } from "../themes";
 
 
 for (const statusTheme of statusThemes) {

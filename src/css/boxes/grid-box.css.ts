@@ -1,5 +1,5 @@
 import { globalStyle } from "@vanilla-extract/css";
-import { GLOBAL_COLORS } from "./global.css";
+import { GLOBAL_COLORS } from "../global.css";
 
 
 const baseCallout = "grid-box";

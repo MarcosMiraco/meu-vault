@@ -1,6 +1,6 @@
-import { PluginSettingTab, Setting } from "obsidian"
 import MeuPlugin from "../main";
-import { GLOBAL_COLORS } from "../css/global.css";
+import { PluginSettingTab, Setting } from "obsidian"
+import { GLOBAL_COLORS } from "../css";
 
 
 export interface MeuPluginSettings {
@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: MeuPluginSettings = {
 }
 
 export class MeuVaultSettingTab extends PluginSettingTab {
-    private folderListEl: HTMLElement | null = null;
+    private folderListContainerEl: HTMLElement | undefined = undefined;
     private plugin: MeuPlugin;
 
     constructor(app: import("obsidian").App, plugin: MeuPlugin) {
@@ -47,9 +47,19 @@ export class MeuVaultSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
+        
+        this.renderStatusThemesSettings(containerEl);
+        this.renderColoredFoldersSettings(containerEl);
+    }
 
-        containerEl.createEl('h2', { text: 'Status Themes' });
-        new Setting(containerEl)
+    applySettings() {
+        document.body.toggleClass("colored-folders-legacy-enabled", this.plugin.settings.coloredFoldersLegacy);
+        this.plugin.injectColoredFoldersStyles();
+    }
+
+    renderStatusThemesSettings(containerEl: HTMLElement) {
+        const { groupItemsContainer } = this.generateSettingsGroup(containerEl, "Status Themes");
+        new Setting(groupItemsContainer)
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.updateCssClassesOnStatusChange)
                 .onChange(async (value) => {
@@ -58,9 +68,11 @@ export class MeuVaultSettingTab extends PluginSettingTab {
                 })
             )
             .setName("Update CSS Classes on Status Change");
+    }
 
-        containerEl.createEl('h2', { text: 'Colored Folders' });
-        new Setting(containerEl)
+    renderColoredFoldersSettings(containerEl: HTMLElement) {
+        const { groupItemsContainer } = this.generateSettingsGroup(containerEl, "Colored Folders");
+        new Setting(groupItemsContainer)
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.coloredFoldersLegacy)
                 .onChange(async (value) => {
@@ -72,39 +84,38 @@ export class MeuVaultSettingTab extends PluginSettingTab {
                 })
             )
             .setName("Legacy Colored Folders")
-        
+
         this.renderFolderList(containerEl);
     }
 
-    applySettings() {
-        document.body.toggleClass("colored-folders-legacy-enabled", this.plugin.settings.coloredFoldersLegacy);
-        this.plugin.injectColoredFoldersStyles();
-    }
-
     renderFolderList(containerEl: HTMLElement) {
-        this.folderListEl?.remove();
-        this.folderListEl = containerEl.createDiv();
-
         const isLegacy = this.plugin.settings.coloredFoldersLegacy;
+
+        this.folderListContainerEl?.remove();
+        const { groupContainer, groupItemsContainer } = this.generateSettingsGroup(
+            containerEl, 
+            isLegacy ? 
+                'Legacy Colors' : 
+                'Enhanced Colors'
+        );
+        this.folderListContainerEl = groupContainer;
+
         const colors = isLegacy
             ? this.plugin.settings.coloredFoldersLegacyColors
             : this.plugin.settings.coloredFoldersEnhancedColors;
 
-        this.folderListEl.createEl('h3', { text: isLegacy ? 'Legacy Colors' : 'Enhanced Colors' });
-
         for (let index = 0; index < colors.length; index++) {
-            this.renderFolderColorSetting(this.folderListEl, colors, index, isLegacy);
+            this.renderFolderColorSetting(groupItemsContainer, colors, index, isLegacy);
         }
 
-        // Botão de adicionar no final
-        new Setting(this.folderListEl)
+        new Setting(groupItemsContainer)
             .addButton(button => button
                 .setButtonText("Add Folder")
                 .setIcon("plus")
                 .onClick(async () => {
                     colors.push({ prefix: "00", color: GLOBAL_COLORS.darker.gray });
                     await this.saveAndApply(isLegacy, colors);
-                    this.renderFolderList(containerEl); // re-renderiza com o novo item
+                    this.renderFolderList(containerEl);
                 })
             );
     }
@@ -221,6 +232,18 @@ export class MeuVaultSettingTab extends PluginSettingTab {
                 }
             });
         });
+    }
+
+    generateSettingsGroup(container: HTMLElement, title: string) {
+        const groupContainer = container.createDiv({ cls: "setting-group" });
+        groupContainer
+            .createDiv({ cls: "setting-item setting-item-heading" })
+            .createDiv({ cls: "setting-item-name", text: title });
+
+        return {
+            groupContainer: groupContainer, 
+            groupItemsContainer: groupContainer.createDiv({ cls: "setting-items" })
+        };
     }
 
     isPredefined(hex: string): boolean {

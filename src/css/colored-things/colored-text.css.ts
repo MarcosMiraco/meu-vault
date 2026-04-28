@@ -1,5 +1,5 @@
 import { globalStyle } from "@vanilla-extract/css";
-import { defaultTheme, themes } from "./themes";
+import { defaultTheme, themes } from "../themes";
 
 
 const baseColoredText = "colored-text";

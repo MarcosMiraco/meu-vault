@@ -1,20 +1,21 @@
 import { globalStyle } from "@vanilla-extract/css";
-import { GLOBAL_COLORS } from "./global.css";
+import { GLOBAL_COLORS } from "../global.css";
 
 
-globalStyle(".nav-folder-title", {
+const coloredFoldersLegacySelector = "body:is(.colored-folders-legacy-enabled)";
+globalStyle(`${coloredFoldersLegacySelector} .nav-folder-title`, {
     vars: {
         "--nav-item-color": GLOBAL_COLORS.default.white
     },
     backgroundColor: "var(--folder-color)"
 })
-globalStyle(".nav-folder-title .collapse-icon", {
+globalStyle(`${coloredFoldersLegacySelector} .nav-folder-title .collapse-icon`, {
     vars: {
         "--nav-collapse-icon-color": GLOBAL_COLORS.default.white
     }
 })
 
-globalStyle(".nav-folder-children", {
+globalStyle(`${coloredFoldersLegacySelector} .nav-folder-children`, {
     vars: {
         "--nav-item-color": GLOBAL_COLORS.default.white
     },
