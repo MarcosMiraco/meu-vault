@@ -1,6 +1,7 @@
 import { Plugin } from 'obsidian';
 import { statusThemeNames } from './css/index';
-import { DEFAULT_SETTINGS, MeuVaultSettingTab, IMeuPluginSettings, IFolderColorSetting } from './settings/settings';
+import { DEFAULT_SETTINGS, MeuVaultSettingTab } from './settings/settings.main';
+import { IFolderColorSetting, IMeuPluginSettings } from './settings/settings.interfaces';
 import './css/index';
 
 
