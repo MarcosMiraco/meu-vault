@@ -1,11 +1,11 @@
 import { Plugin } from 'obsidian';
 import { statusThemeNames } from './css/index';
-import { DEFAULT_SETTINGS, MeuVaultSettingTab, MeuPluginSettings } from './settings/settings';
+import { DEFAULT_SETTINGS, MeuVaultSettingTab, IMeuPluginSettings, IFolderColorSetting } from './settings/settings';
 import './css/index';
 
 
 export default class MeuPlugin extends Plugin {
-	public settings: MeuPluginSettings = DEFAULT_SETTINGS;
+	public settings: IMeuPluginSettings = DEFAULT_SETTINGS;
 	private styleEl: HTMLStyleElement | null = null;
 	private classesPropertyName = "cssclasses";
 
@@ -64,28 +64,44 @@ export default class MeuPlugin extends Plugin {
 			document.head.appendChild(this.styleEl);
 		}
 
-		let rules = "";
+		let selector = "";
+		let colorsArray: IFolderColorSetting[];
 		if (this.settings.coloredFoldersLegacy) {
-			rules = this.settings.coloredFoldersLegacyColors
-				.map(({ prefix, color }) => `
-					body.colored-folders-legacy-enabled 
-					.nav-folder:has(> [data-path^="${prefix}"]) {
-						--folder-color: ${color};
-					}
-				`)
-				.join("\n");
+			selector = "body.colored-folders-legacy-enabled";
+			colorsArray = this.settings.coloredFoldersLegacyColors;
 		}
 		else {
-			rules = this.settings.coloredFoldersEnhancedColors
-				.map(({ prefix, color }) => `
-					body:not(.colored-folders-legacy-enabled) 
-					.nav-folder:has(> [data-path^="${prefix}"]) {
-						--folder-color: ${color};
-					}
-				`)
-				.join("\n");
+			selector = "body:not(.colored-folders-legacy-enabled)";
+			colorsArray = this.settings.coloredFoldersEnhancedColors;
 		}
 
+		const rules = colorsArray
+			.map(({ 
+				prefix, 
+				applyToSubFolders, 
+
+				textColor, 
+				highlightTextColor,
+				activeTextColor,
+
+				backgroundColor,
+				highlightBackgroundColor,
+				activeBackgroundColor
+			}) => `
+				${selector} 
+				.nav-folder:has(> [data-path${applyToSubFolders ? "*" : "^"}="${prefix}"]) {
+					--nav-tag-color: ${textColor};
+					--nav-tag-color-hover: ${highlightTextColor};
+					--nav-item-color-active: ${activeTextColor};
+					--nav-item-color-hover: ${highlightTextColor};
+					--nav-item-color: ${textColor};
+
+					--nav-item-background-active: ${activeBackgroundColor};
+					--nav-item-background-hover: ${highlightBackgroundColor};
+					--folder-color: ${backgroundColor} ${applyToSubFolders ? "!important" : ""};
+				}
+			`)
+			.join("\n");
 
 		this.styleEl.textContent = rules;
 	}
@@ -128,7 +144,7 @@ export default class MeuPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MeuPluginSettings>);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<IMeuPluginSettings>);
 	}
 
 	async saveSettings() {

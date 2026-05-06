@@ -1,5 +1,6 @@
 import { globalStyle } from "@vanilla-extract/css";
-import { defaultTheme, themes } from "./themes";
+import { defaultTheme, themes } from "../themes";
+import { GLOBAL_COLORS } from "../global.css";
 
 
 const baseCallout = "highlight-box";
@@ -10,7 +11,7 @@ globalStyle(`.callout[data-callout=${baseCallout}]`, {
         "--border-color": defaultTheme.defaultColor,
         "--highlight-text-color": defaultTheme.textPrimaryColor,
         "--gradient-end-color": defaultTheme.gradientEndColor,
-        "--highlight-marker-color": defaultTheme.darkestColor,
+        "--highlight-marker-color": GLOBAL_COLORS.default.white,
         "--degre": defaultTheme.degre as string
     },
     padding: "10px",
@@ -40,8 +41,8 @@ for (const style of themes) {
     const linkColor = style.linkInternalColor ?? defaultTheme.linkInternalColor as string;
     const backgroundColor = style.defaultColor ?? defaultTheme.defaultColor;
     const borderColor = style.defaultColor ?? defaultTheme.defaultColor;
-    const textColor = style.textPrimaryColor ?? defaultTheme.textPrimaryColor
-    const markerColor = style.darkestColor ?? defaultTheme.darkestColor;
+    const textColor = style.textPrimaryColor ?? defaultTheme.textPrimaryColor;
+    const markerColor = GLOBAL_COLORS.default.white;
     const gradientEndColor = style.gradientEndColor ?? defaultTheme.gradientEndColor;
 
     globalStyle(`.callout[data-callout-metadata*=${style.name}][data-callout=${baseCallout}]`, {

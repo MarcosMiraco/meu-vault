@@ -3,36 +3,80 @@ import { PluginSettingTab, Setting } from "obsidian"
 import { GLOBAL_COLORS } from "../css";
 
 
-export interface MeuPluginSettings {
+export interface IFolderColorSetting {
+    prefix: string; 
+    applyToSubFolders: boolean;
+
+    textColor: string;
+    highlightTextColor: string;
+    activeTextColor: string;
+    
+    backgroundColor: string;
+    highlightBackgroundColor: string;
+    activeBackgroundColor: string;
+}
+
+export type FolderColorSettingKey = keyof IFolderColorSetting;
+
+export interface IMeuPluginSettings {
     updateCssClassesOnStatusChange: boolean;
 
     coloredFoldersLegacy: boolean;
-    coloredFoldersEnhancedColors: { prefix: string; color: string }[];
-    coloredFoldersLegacyColors: { prefix: string; color: string }[];
+    coloredFoldersEnhancedColors: IFolderColorSetting[];
+    coloredFoldersLegacyColors: IFolderColorSetting[];
 }
 
-export const DEFAULT_SETTINGS: MeuPluginSettings = {
+export const DEFAULT_SETTINGS: IMeuPluginSettings = {
     updateCssClassesOnStatusChange: false,
-
     coloredFoldersLegacy: false,
     coloredFoldersEnhancedColors: [
-        { prefix: "01", color: GLOBAL_COLORS.darker.gray },
-        { prefix: "02", color: GLOBAL_COLORS.darker.green },
-        { prefix: "03", color: GLOBAL_COLORS.darker.purple },
-        { prefix: "04", color: GLOBAL_COLORS.darker.orange },
-        { prefix: "97", color: GLOBAL_COLORS.default.black },
-        { prefix: "98", color: GLOBAL_COLORS.default.black },
-        { prefix: "99", color: GLOBAL_COLORS.default.black }
+        defaultFolderColorSchema("01", "gray"),
+        defaultFolderColorSchema("02", "green"),
+        defaultFolderColorSchema("03", "purple"),
+        defaultFolderColorSchema("04", "orange"),
+        defaultFolderColorSchema("97", "black"),
+        defaultFolderColorSchema("98", "black"),
+        defaultFolderColorSchema("99", "black")
     ],
     coloredFoldersLegacyColors: [
-        { prefix: "01", color: GLOBAL_COLORS.darker.cyan },
-        { prefix: "02", color: GLOBAL_COLORS.darker.blue },
-        { prefix: "03", color: GLOBAL_COLORS.darker.indigo },
-        { prefix: "04", color: GLOBAL_COLORS.darker.purple },
-        { prefix: "97", color: GLOBAL_COLORS.default.pink },
-        { prefix: "98", color: GLOBAL_COLORS.default.pink },
-        { prefix: "99", color: GLOBAL_COLORS.default.pink }
+        defaultFolderColorSchema("01", "cyan"),
+        defaultFolderColorSchema("02", "blue"),
+        defaultFolderColorSchema("03", "indigo"),
+        defaultFolderColorSchema("04", "purple"),
+        defaultFolderColorSchema("97", "pink"),
+        defaultFolderColorSchema("98", "pink"),
+        defaultFolderColorSchema("99", "pink")
     ]
+}
+
+function defaultFolderColorSchema(prefix: string, colorName: keyof typeof GLOBAL_COLORS.default): IFolderColorSetting {
+    const textColor = GLOBAL_COLORS.default.white;
+    const activeTextColor = GLOBAL_COLORS.default.color;
+    const highlightTextColor = GLOBAL_COLORS.default.color;
+
+    const backgroundColor = 
+        GLOBAL_COLORS.darker[colorName as keyof typeof GLOBAL_COLORS.darker] ??
+        GLOBAL_COLORS.default[colorName];
+    const activeBackgroundColor = 
+        GLOBAL_COLORS.transparent[colorName as keyof typeof GLOBAL_COLORS.transparent] ??
+        GLOBAL_COLORS.default[colorName];
+    const highlightBackgroundColor = 
+        GLOBAL_COLORS.darkest[colorName as keyof typeof GLOBAL_COLORS.darkest] ??
+        GLOBAL_COLORS.default[colorName];
+
+    return {
+        prefix,
+        applyToSubFolders: false,
+
+        textColor,
+        highlightTextColor,
+
+        backgroundColor,
+        highlightBackgroundColor,
+
+        activeTextColor,
+        activeBackgroundColor
+    }
 }
 
 export class MeuVaultSettingTab extends PluginSettingTab {
@@ -113,7 +157,7 @@ export class MeuVaultSettingTab extends PluginSettingTab {
                 .setButtonText("Add Folder")
                 .setIcon("plus")
                 .onClick(async () => {
-                    colors.push({ prefix: "00", color: GLOBAL_COLORS.darker.gray });
+                    colors.push(defaultFolderColorSchema("00", "gray"));
                     await this.saveAndApply(isLegacy, colors);
                     this.renderFolderList(containerEl);
                 })
@@ -122,15 +166,25 @@ export class MeuVaultSettingTab extends PluginSettingTab {
 
     renderFolderColorSetting(
         container: HTMLElement,
-        colors: { prefix: string; color: string }[],
+        colors: IFolderColorSetting[],
         index: number,
         isLegacy: boolean
     ) {
         const entry = colors[index]!;
         const setting = new Setting(container)
             .setName(`Pasta: ${entry.prefix}`)
-            .setDesc(entry.color)
 
+        this.renderFolderColorButtons(setting, colors, entry, index, isLegacy);
+        this.renderFolderColorOptions(container, colors, entry, index, isLegacy);
+    }
+
+    renderFolderColorButtons(
+        setting: Setting,         
+        colors: IFolderColorSetting[],
+        entry: IFolderColorSetting,
+        index: number,
+        isLegacy: boolean
+    ) {
         setting.addExtraButton(btn => {
             btn.setIcon("chevron-up")
                 .setTooltip("Move up")
@@ -195,8 +249,97 @@ export class MeuVaultSettingTab extends PluginSettingTab {
                 this.renderFolderList(this.containerEl);
             })
         );
+    }
 
-        setting.addDropdown(dropdown => {
+    renderFolderColorOptions(
+        container: HTMLElement,
+        colors: IFolderColorSetting[],
+        entry: IFolderColorSetting,
+        index: number,
+        isLegacy: boolean
+    ) {
+        const colorOptionsContainer = this.generateSettingsOptionList(container);
+
+        const applyToSubFolderOptionContainer = colorOptionsContainer.createEl("li");
+        const applyToSubFolderSetting = new Setting(applyToSubFolderOptionContainer)
+        applyToSubFolderSetting
+            .addToggle(toggle => toggle
+                .setValue(entry.applyToSubFolders)
+                .onChange(async (value) => {
+                    colors[index]!.applyToSubFolders = value;
+                    await this.saveAndApply(isLegacy, colors);
+                })
+            )
+            .setName("Apply To Sub Folders");
+
+        this.renderFolderColorOptionItem(
+            colorOptionsContainer, 
+            "textColor",
+            colors,
+            entry, 
+            index,
+            isLegacy
+        )
+        this.renderFolderColorOptionItem(
+            colorOptionsContainer, 
+            "activeTextColor",
+            colors,
+            entry, 
+            index,
+            isLegacy
+        )
+        this.renderFolderColorOptionItem(
+            colorOptionsContainer, 
+            "highlightBackgroundColor",
+            colors,
+            entry, 
+            index,
+            isLegacy
+        )
+
+        this.renderFolderColorOptionItem(
+            colorOptionsContainer, 
+            "backgroundColor",
+            colors,
+            entry, 
+            index,
+            isLegacy
+        )
+        this.renderFolderColorOptionItem(
+            colorOptionsContainer, 
+            "activeBackgroundColor",
+            colors,
+            entry, 
+            index,
+            isLegacy
+        )
+        this.renderFolderColorOptionItem(
+            colorOptionsContainer, 
+            "highlightBackgroundColor",
+            colors,
+            entry, 
+            index,
+            isLegacy
+        )
+    }
+
+    renderFolderColorOptionItem(
+        container: HTMLElement, 
+        type: FolderColorSettingKey,
+        colors: IFolderColorSetting[],
+        entry: IFolderColorSetting,
+        index: number,
+        isLegacy: boolean
+    ) {
+        if (type === "applyToSubFolders") return;
+
+        const entryTypeValue = entry[type];
+        const colorOptionItem = container.createEl("li");
+        const colorOptionItemSetting = new Setting(colorOptionItem)
+            .setName(type)
+            .setDesc(entryTypeValue)
+
+        colorOptionItemSetting.addDropdown(dropdown => {
             const colorOptions: Record<string, string> = {
                 ...this.processGlobalColors(),
                 "Custom": "custom"
@@ -206,28 +349,29 @@ export class MeuVaultSettingTab extends PluginSettingTab {
                 dropdown.addOption(value, key);
             }
 
-            const isPredefined = this.isPredefined(entry.color);
-            dropdown.setValue(isPredefined ? entry.color : "custom");
+            const isPredefined = this.isPredefined(entryTypeValue);
+            dropdown.setValue(isPredefined ? entryTypeValue : "custom");
 
             const colorPickerContainer = container.createDiv({ cls: "color-picker-container" });
             const colorInput = colorPickerContainer.createEl("input", { type: "color" });
-            colorInput.value = entry.color;
+            colorInput.value = entryTypeValue;
             colorPickerContainer.style.display = isPredefined ? "none" : "block";
 
             colorInput.addEventListener("change", async () => {
-                colors[index]!.color = colorInput.value;
-                setting.setDesc(colorInput.value);
+                colors[index]![type] = colorInput.value;
+                colorOptionItemSetting.setDesc(colorInput.value);
                 await this.saveAndApply(isLegacy, colors);
             });
 
             dropdown.onChange(async (value) => {
                 if (value === "custom") {
                     colorPickerContainer.style.display = "block";
-                } else {
+                } 
+                else {
                     colorPickerContainer.style.display = "none";
-                    colors[index]!.color = value;
+                    colors[index]![type] = value;
                     colorInput.value = value;
-                    setting.setDesc(value);
+                    colorOptionItemSetting.setDesc(value);
                     await this.saveAndApply(isLegacy, colors);
                 }
             });
@@ -246,6 +390,16 @@ export class MeuVaultSettingTab extends PluginSettingTab {
         };
     }
 
+    generateSettingsOptionList(container: HTMLElement) {
+        const settingOptionListContainer = container.createEl("ul", { cls: "setting-list" });
+        settingOptionListContainer.style.display = "flex";
+        settingOptionListContainer.style.flexDirection = "column";
+        settingOptionListContainer.style.gap = "10px";
+        settingOptionListContainer.style.marginBottom = "10px";
+
+        return settingOptionListContainer;
+    }
+
     isPredefined(hex: string): boolean {
         for (const colors of Object.values(GLOBAL_COLORS)) {
             for (const value of Object.values(colors)) {
@@ -255,7 +409,7 @@ export class MeuVaultSettingTab extends PluginSettingTab {
         return false;
     }
 
-    async saveAndApply(isLegacy: boolean, colors: { prefix: string; color: string }[]) {
+    async saveAndApply(isLegacy: boolean, colors: IFolderColorSetting[]) {
         if (isLegacy) {
             this.plugin.settings.coloredFoldersLegacyColors = colors;
         } else {
