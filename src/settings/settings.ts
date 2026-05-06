@@ -24,6 +24,8 @@ export interface IMeuPluginSettings {
     coloredFoldersLegacy: boolean;
     coloredFoldersEnhancedColors: IFolderColorSetting[];
     coloredFoldersLegacyColors: IFolderColorSetting[];
+
+    collapsedFolders: string[];
 }
 
 export const DEFAULT_SETTINGS: IMeuPluginSettings = {
@@ -46,7 +48,8 @@ export const DEFAULT_SETTINGS: IMeuPluginSettings = {
         defaultFolderColorSchema("97", "pink"),
         defaultFolderColorSchema("98", "pink"),
         defaultFolderColorSchema("99", "pink")
-    ]
+    ],
+    collapsedFolders: []
 }
 
 function defaultFolderColorSchema(prefix: string, colorName: keyof typeof GLOBAL_COLORS.default): IFolderColorSetting {
@@ -81,11 +84,13 @@ function defaultFolderColorSchema(prefix: string, colorName: keyof typeof GLOBAL
 
 export class MeuVaultSettingTab extends PluginSettingTab {
     private folderListContainerEl: HTMLElement | undefined = undefined;
+    private collapsedFolders: Set<string> = new Set();
     private plugin: MeuPlugin;
 
     constructor(app: import("obsidian").App, plugin: MeuPlugin) {
         super(app, plugin);
         this.plugin = plugin;
+        this.collapsedFolders = new Set(plugin.settings.collapsedFolders);
     }
 
     display(): void {
@@ -148,7 +153,12 @@ export class MeuVaultSettingTab extends PluginSettingTab {
             ? this.plugin.settings.coloredFoldersLegacyColors
             : this.plugin.settings.coloredFoldersEnhancedColors;
 
+        const isEmpty = this.collapsedFolders.size === 0;
         for (let index = 0; index < colors.length; index++) {
+            const collapseKey = `${isLegacy ? "legacy" : "enhanced"}-${colors[index]!.prefix}`;
+            if (isEmpty && !this.collapsedFolders.has(collapseKey)) {
+                this.collapsedFolders.add(collapseKey);
+            }
             this.renderFolderColorSetting(groupItemsContainer, colors, index, isLegacy);
         }
 
@@ -171,11 +181,42 @@ export class MeuVaultSettingTab extends PluginSettingTab {
         isLegacy: boolean
     ) {
         const entry = colors[index]!;
-        const setting = new Setting(container)
-            .setName(`Pasta: ${entry.prefix}`)
+        const collapseKey = `${isLegacy ? "legacy" : "enhanced"}-${entry.prefix}`;
+        const isCollapsed = this.collapsedFolders.has(collapseKey);
+        const setting = new Setting(container);
+
+        const collapseBtn = setting.nameEl.createEl("button", { cls: "clickable-icon setting-collapse-btn" });
+        collapseBtn.setAttribute("aria-label", isCollapsed ? "Expandir" : "Minimizar");
+        collapseBtn.innerHTML = isCollapsed
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+        collapseBtn.style.cssText = "background: none; border: none; cursor: pointer; padding: 0 4px 0 0; display: inline-flex; align-items: center; opacity: 0.7; vertical-align: middle;";
+
+        setting.nameEl.appendText(`Pasta: ${entry.prefix}`);
+
+        const optionsWrapper = container.createDiv();
+        optionsWrapper.style.display = isCollapsed ? "none" : "block";
+
+        collapseBtn.addEventListener("click", () => {
+            const nowCollapsed = this.collapsedFolders.has(collapseKey);
+            if (nowCollapsed) {
+                this.collapsedFolders.delete(collapseKey);
+                optionsWrapper.style.display = "block";
+                collapseBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+                collapseBtn.setAttribute("aria-label", "Minimizar");
+            } 
+            else {
+                this.collapsedFolders.add(collapseKey);
+                optionsWrapper.style.display = "none";
+                collapseBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+                collapseBtn.setAttribute("aria-label", "Expandir");
+            }
+            this.plugin.settings.collapsedFolders = Array.from(this.collapsedFolders);
+            this.plugin.saveSettings();
+        });
 
         this.renderFolderColorButtons(setting, colors, entry, index, isLegacy);
-        this.renderFolderColorOptions(container, colors, entry, index, isLegacy);
+        this.renderFolderColorOptions(optionsWrapper, colors, entry, index, isLegacy);
     }
 
     renderFolderColorButtons(
@@ -290,7 +331,7 @@ export class MeuVaultSettingTab extends PluginSettingTab {
         )
         this.renderFolderColorOptionItem(
             colorOptionsContainer, 
-            "highlightBackgroundColor",
+            "highlightTextColor",
             colors,
             entry, 
             index,
