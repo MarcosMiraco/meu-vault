@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { statusThemeNames } from './css/index';
+import { GLOBAL_COLORS, statusThemeNames } from './css/index';
 import { DEFAULT_SETTINGS, MeuVaultSettingTab } from './settings/settings.main';
 import { IFolderColorSetting, IMeuPluginSettings } from './settings/settings.interfaces';
 import './css/index';
@@ -93,10 +93,10 @@ export default class MeuPlugin extends Plugin {
 				.nav-folder:has(> [data-path${applyToSubFolders ? "*" : "^"}="${prefix}"]) {
 					--nav-tag-color: ${textColor};
 					--nav-tag-color-hover: ${highlightTextColor};
+					--nav-collapse-icon-color: ${GLOBAL_COLORS.default.white};
 					--nav-item-color-active: ${activeTextColor};
 					--nav-item-color-hover: ${highlightTextColor};
 					--nav-item-color: ${textColor};
-
 					--nav-item-background-active: ${activeBackgroundColor};
 					--nav-item-background-hover: ${highlightBackgroundColor};
 					--folder-color: ${backgroundColor} ${applyToSubFolders ? "!important" : ""};
