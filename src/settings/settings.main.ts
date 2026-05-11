@@ -7,6 +7,7 @@ import { SettingsColoredStatus } from "./models/settingsColoredStatus.model";
 
 
 export const DEFAULT_SETTINGS: IMeuPluginSettings = {
+    configVersion: "1.0",
     updateCssClassesOnStatusChange: false,
     coloredFoldersLegacy: false,
     coloredFoldersEnhancedColors: [

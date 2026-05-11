@@ -145,7 +145,14 @@ export default class MeuPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<IMeuPluginSettings>);
+		let loadedSettings = await this.loadData() as IMeuPluginSettings;
+
+		if (loadedSettings.configVersion !== DEFAULT_SETTINGS.configVersion) {
+			loadedSettings.configVersion = DEFAULT_SETTINGS.configVersion;
+			loadedSettings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
+			await this.saveData(loadedSettings);
+		}
+		this.settings = loadedSettings;
 	}
 
 	async saveSettings() {

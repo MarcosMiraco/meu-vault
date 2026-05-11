@@ -14,6 +14,7 @@ export interface IFolderColorSetting {
 export type FolderColorSettingKey = keyof IFolderColorSetting;
 
 export interface IMeuPluginSettings {
+    configVersion: string;
     updateCssClassesOnStatusChange: boolean;
 
     coloredFoldersLegacy: boolean;
