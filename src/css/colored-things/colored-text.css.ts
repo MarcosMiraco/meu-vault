@@ -16,7 +16,6 @@ globalStyle(`.${baseColoredText}.bold`, { fontWeight: "bold" })
 globalStyle(`.${baseColoredText}.italic`, { fontStyle: "italic" })
 globalStyle(`.${baseColoredText}.underline`, { textDecoration: "underline" })
 globalStyle(`.${baseColoredText}.strikethrough`, { textDecoration: "line-through" })
-globalStyle(`.${baseColoredText}.strikethrough`, { textDecoration: "line-through" })
 
 globalStyle(`[class*="highlight"].${baseColoredText}`, {
     backgroundColor: "var(--colored-text-highlight-color)"

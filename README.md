@@ -78,6 +78,24 @@ Ambos os modos são totalmente personalizáveis: é possível adicionar, remover
 
 ---
 
+### Texto colorido
+
+Você pode usar também o colored-text:
+| Variante | Descrição |
+|---|---|
+| `bold` | Para fazer o texto negrito |
+| `italic` | Para fazer o texto ficar italico |
+| `underline` | Para criar uma underline embaixo do texto |
+| `strikethrough` | Para riscar o texto |
+| `highlight` | Para destacar o texto também pode ser combinado com as cores `highlight-blue` por exemplo |
+| `grad` | Texto em gradiente da cor até seu complementar |
+
+**Cores disponíveis:** `cyan` `blue` `purple` `indigo` `pink` `red` `orange` `yellow` `green` `teal` `sepia` `black` `white`
+
+```md
+<span class="colored-text orange grad">Seu texto aqui</span>
+```
+
 ### Status Themes
 
 O plugin monitora o frontmatter das suas notas em busca de qualquer propriedade que comece com `status`. Quando um nome de tema reconhecido é encontrado, ele é adicionado automaticamente ao `cssclasses` da nota — aplicando o tema visual correspondente no Obsidian. A classe é removida automaticamente quando o status deixa de corresponder.
