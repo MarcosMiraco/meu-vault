@@ -77,11 +77,11 @@ export default class MeuPlugin extends Plugin {
 		}
 
 		const rules = colorsArray
-			.map(({ 
-				prefix, 
-				applyToSubFolders, 
+			.map(({
+				prefix,
+				applyToSubFolders,
 
-				textColor, 
+				textColor,
 				highlightTextColor,
 				activeTextColor,
 
@@ -115,7 +115,7 @@ export default class MeuPlugin extends Plugin {
 
 		for (const key in cache.frontmatter) {
 			if (!key.toLocaleLowerCase().startsWith("status")) continue;
-			
+
 			const value = cache.frontmatter[key];
 			if (!Array.isArray(value)) continue;
 
@@ -128,7 +128,7 @@ export default class MeuPlugin extends Plugin {
 				const themeToAdd = statusThemeNames[valueThemeIndex];
 				if (!frontMatter[this.classesPropertyName].includes(themeToAdd)) {
 					frontMatter[this.classesPropertyName].push(themeToAdd);
-				}			
+				}
 			})
 			return;
 		}
@@ -144,18 +144,75 @@ export default class MeuPlugin extends Plugin {
 		})
 	}
 
-	async loadSettings() {
-		let loadedSettings = await this.loadData() as IMeuPluginSettings;
-
-		if (loadedSettings.configVersion !== DEFAULT_SETTINGS.configVersion) {
-			loadedSettings.configVersion = DEFAULT_SETTINGS.configVersion;
-			loadedSettings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
-			await this.saveData(loadedSettings);
-		}
-		this.settings = loadedSettings;
-	}
-
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async loadSettings() {
+		const loadedSettings: Partial<IMeuPluginSettings> = await this.loadData();
+
+		if (loadedSettings?.configVersion === DEFAULT_SETTINGS.configVersion) {
+			this.settings = loadedSettings as IMeuPluginSettings;;
+			return;
+		}
+
+		const migratedSettings = this.migrateSettings(loadedSettings ?? {});
+		this.settings = migratedSettings
+
+		await this.saveSettings();
+		return;
+	}
+
+	private migrateSettings(loaded: Partial<IMeuPluginSettings>): IMeuPluginSettings {
+		return this.mergeWithDefaults<IMeuPluginSettings>(DEFAULT_SETTINGS, loaded);
+	}
+
+	private mergeWithDefaults<T extends object>(defaults: T, loaded: Partial<T>): T {
+		const result = {} as T;
+
+		for (const key in defaults) {
+			const k = key as keyof T;
+			const defaultValue = defaults[k];
+			const userValue = loaded[k];
+
+			result[k] = this.resolveValue(defaultValue, userValue) as T[keyof T];
+		}
+
+		return result;
+	}
+
+	private resolveValue<T>(defaultValue: T, userValue: unknown): T {
+		if (Array.isArray(defaultValue)) {
+			if (!Array.isArray(userValue)) return defaultValue;
+			return this.mergeArray(defaultValue, userValue) as T;
+		}
+
+		if (typeof defaultValue === "object" && defaultValue !== null) {
+			if (typeof userValue !== "object" || userValue === null || Array.isArray(userValue)) {
+				return defaultValue;
+			}
+			return this.mergeWithDefaults(defaultValue as object, userValue as object) as T;
+		}
+
+		if (userValue !== undefined && typeof userValue === typeof defaultValue) {
+			return userValue as T;
+		}
+
+		return defaultValue;
+	}
+
+	private mergeArray<T>(defaultArr: T[], userArr: unknown[]): T[] {
+		if (defaultArr.length === 0) {
+			return userArr as T[];
+		}
+
+		const template = defaultArr[0];
+		if (typeof template !== "object" || template === null) {
+			return userArr.filter(item => typeof item === typeof template) as T[];
+		}
+
+		return userArr
+			.filter(item => typeof item === "object" && item !== null && !Array.isArray(item))
+			.map(item => this.mergeWithDefaults(template as object, item as object)) as T[];
 	}
 }
