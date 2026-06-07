@@ -45,7 +45,7 @@ export class MeuVaultSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
         
-        this.settingsColoredStatusModel.renderStatusThemesSettings(containerEl);
+        // this.settingsColoredStatusModel.renderStatusThemesSettings(containerEl);
         this.settingsColoredFoldersModel.renderMainColoredFoldersSettings(containerEl);
     }
 

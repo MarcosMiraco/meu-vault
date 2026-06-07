@@ -2,6 +2,7 @@ import { Setting } from "obsidian";
 import { MyVaultSettingsBase } from "./settingsBase.model";
 import { FolderColorSettingKey, IFolderColorSetting } from "../settings.interfaces";
 import { defaultFolderColorSchema } from "../settings.utils";
+import { ColorPickerModal } from "../ColorPickerModal";
 import MeuPlugin from "../../main";
 
 
@@ -14,7 +15,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
     }
 
     renderMainColoredFoldersSettings(containerEl: HTMLElement) {
-        const { groupItemsContainer } = this.generateSettingsGroup(containerEl, "Colored Folders");
+        const { groupItemsContainer } = this.generateSettingsGroup(containerEl, "Pastas Coloridas");
         new Setting(groupItemsContainer)
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.coloredFoldersLegacy)
@@ -26,7 +27,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
                     this.renderColoredFoldersList(containerEl);
                 })
             )
-            .setName("Legacy Colored Folders")
+            .setName("Pastas Coloridas (Legado)")
 
         this.renderColoredFoldersList(containerEl);
     }
@@ -37,9 +38,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
         this.folderListContainerEl?.remove();
         const { groupContainer, groupItemsContainer } = this.generateSettingsGroup(
             containerEl,
-            isLegacy ?
-                'Legacy Colors' :
-                'Enhanced Colors'
+            isLegacy ? 'Cores Legadas' : 'Cores Aprimoradas'
         );
         this.folderListContainerEl = groupContainer;
 
@@ -58,7 +57,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
 
         new Setting(groupItemsContainer)
             .addButton(button => button
-                .setButtonText("Add Folder")
+                .setButtonText("Adicionar Pasta")
                 .setIcon("plus")
                 .onClick(async () => {
                     colors.push(defaultFolderColorSchema("00", "gray"));
@@ -98,8 +97,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
                 optionsWrapper.style.display = "block";
                 collapseBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
                 collapseBtn.setAttribute("aria-label", "Minimizar");
-            }
-            else {
+            } else {
                 this.collapsedFolders.add(collapseKey);
                 optionsWrapper.style.display = "none";
                 collapseBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
@@ -121,7 +119,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
     ) {
         setting.addExtraButton(btn => {
             btn.setIcon("chevron-up")
-                .setTooltip("Move up")
+                .setTooltip("Mover para cima")
                 .setDisabled(index === 0)
                 .onClick(async () => {
                     [colors[index - 1], colors[index]] = [colors[index]!, colors[index - 1]!];
@@ -132,7 +130,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
 
         setting.addExtraButton(btn => {
             btn.setIcon("chevron-down")
-                .setTooltip("Move down")
+                .setTooltip("Mover para baixo")
                 .setDisabled(index === colors.length - 1)
                 .onClick(async () => {
                     [colors[index + 1], colors[index]] = [colors[index]!, colors[index + 1]!];
@@ -143,7 +141,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
 
         setting.addExtraButton(btn => btn
             .setIcon("pencil")
-            .setTooltip("Edit folder prefix")
+            .setTooltip("Editar prefixo da pasta")
             .onClick(() => {
                 const nameEl = setting.nameEl;
                 nameEl.empty();
@@ -161,6 +159,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
                     }
                     nameEl.empty();
                     nameEl.setText(`Pasta: ${colors[index]!.prefix}`);
+                    this.renderColoredFoldersList(this.containerEl);
                 };
 
                 input.addEventListener("blur", confirm);
@@ -169,6 +168,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
                     if (e.key === "Escape") {
                         nameEl.empty();
                         nameEl.setText(`Pasta: ${entry.prefix}`);
+                        this.renderColoredFoldersList(this.containerEl);
                     }
                 });
             })
@@ -176,7 +176,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
 
         setting.addExtraButton(btn => btn
             .setIcon("trash-2")
-            .setTooltip("Remove folder")
+            .setTooltip("Remover pasta")
             .onClick(async () => {
                 colors.splice(index, 1);
                 await this.saveAndApplySettings();
@@ -194,7 +194,7 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
         const colorOptionsContainer = this.generateSettingsOptionList(container);
 
         const applyToSubFolderOptionContainer = colorOptionsContainer.createEl("li");
-        const applyToSubFolderSetting = new Setting(applyToSubFolderOptionContainer)
+        const applyToSubFolderSetting = new Setting(applyToSubFolderOptionContainer);
         applyToSubFolderSetting
             .addToggle(toggle => toggle
                 .setValue(entry.applyToSubFolders)
@@ -203,104 +203,73 @@ export class SettingsColoredFolders extends MyVaultSettingsBase {
                     await this.saveAndApplySettings();
                 })
             )
-            .setName("Apply To Sub Folders");
+            .setName("Aplicar a subpastas");
 
-        this.renderColoredFoldersOptionItem(
-            colorOptionsContainer,
-            "textColor",
-            colors,
-            entry,
-            index
-        )
-        this.renderColoredFoldersOptionItem(
-            colorOptionsContainer,
-            "activeTextColor",
-            colors,
-            entry,
-            index
-        )
-        this.renderColoredFoldersOptionItem(
-            colorOptionsContainer,
-            "highlightTextColor",
-            colors,
-            entry,
-            index
-        )
-
-        this.renderColoredFoldersOptionItem(
-            colorOptionsContainer,
-            "backgroundColor",
-            colors,
-            entry,
-            index
-        )
-        this.renderColoredFoldersOptionItem(
-            colorOptionsContainer,
-            "activeBackgroundColor",
-            colors,
-            entry,
-            index
-        )
-        this.renderColoredFoldersOptionItem(
-            colorOptionsContainer,
-            "highlightBackgroundColor",
-            colors,
-            entry,
-            index
-        )
+        this.renderColoredFoldersOptionItem(colorOptionsContainer, "textColor", "Cor do texto", colors, entry, index);
+        this.renderColoredFoldersOptionItem(colorOptionsContainer, "activeTextColor", "Cor do texto (selecionada)", colors, entry, index);
+        this.renderColoredFoldersOptionItem(colorOptionsContainer, "highlightTextColor", "Cor do texto (mouse)", colors, entry, index);
+        this.renderColoredFoldersOptionItem(colorOptionsContainer, "backgroundColor", "Cor de fundo", colors, entry, index);
+        this.renderColoredFoldersOptionItem(colorOptionsContainer, "activeBackgroundColor", "Cor de fundo (selecionada)", colors, entry, index);
+        this.renderColoredFoldersOptionItem(colorOptionsContainer, "highlightBackgroundColor", "Cor de fundo (mouse)", colors, entry, index);
     }
 
     renderColoredFoldersOptionItem(
         container: HTMLElement,
         type: FolderColorSettingKey,
+        label: string,
         colors: IFolderColorSetting[],
         entry: IFolderColorSetting,
         index: number,
     ) {
         if (type === "applyToSubFolders") return;
 
-        const entryTypeValue = entry[type];
+        const entryTypeValue = entry[type] as string;
         const colorOptionItem = container.createEl("li");
         const colorOptionItemSetting = new Setting(colorOptionItem)
-            .setName(type)
-            .setDesc(entryTypeValue)
+            .setName(label)
+            .setDesc(entryTypeValue);
 
-        colorOptionItemSetting.addDropdown(dropdown => {
-            const colorOptions: Record<string, string> = {
-                ...this.processGlobalColors(),
-                "Custom": "custom"
-            };
+        const colorOptions: Record<string, string> = {
+            ...this.processGlobalColors(),
+        };
 
-            for (const [key, value] of Object.entries(colorOptions)) {
-                dropdown.addOption(value, key);
-            }
+        // Color swatch preview
+        const swatchEl = colorOptionItemSetting.controlEl.createDiv();
+        swatchEl.style.cssText = `
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: ${entryTypeValue};
+            border: 1px solid var(--background-modifier-border);
+            flex-shrink: 0;
+            margin-right: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        `;
 
-            const isPredefined = this.isPredefined(entryTypeValue);
-            dropdown.setValue(isPredefined ? entryTypeValue : "custom");
+        const getLabelForValue = (val: string) => {
+            const match = Object.entries(colorOptions).find(([, v]) => v === val);
+            return match ? match[0] : "Custom";
+        };
 
-            const colorPickerContainer = container.createDiv({ cls: "color-picker-container" });
-            const colorInput = colorPickerContainer.createEl("input", { type: "color" });
-            colorInput.value = entryTypeValue;
-            colorPickerContainer.style.display = isPredefined ? "none" : "block";
-
-            colorInput.addEventListener("change", async () => {
-                colors[index]![type] = colorInput.value;
-                colorOptionItemSetting.setDesc(colorInput.value);
-                await this.saveAndApplySettings();
-            });
-
-            dropdown.onChange(async (value) => {
-                if (value === "custom") {
-                    colorPickerContainer.style.display = "block";
-                }
-                else {
-                    colorPickerContainer.style.display = "none";
-                    colors[index]![type] = value;
-                    colorInput.value = value;
-                    colorOptionItemSetting.setDesc(value);
-                    await this.saveAndApplySettings();
-                }
-            });
+        colorOptionItemSetting.addButton(button => {
+            button
+                .setButtonText(getLabelForValue(entryTypeValue))
+                .onClick(() => {
+                    const modal = new ColorPickerModal(
+                        this.plugin.app,
+                        colorOptions,
+                        colors[index]![type] as string,
+                        async (selected) => {
+                            colors[index]![type] = selected as any;
+                            colorOptionItemSetting.setDesc(selected);
+                            swatchEl.style.background = selected;
+                            button.setButtonText(getLabelForValue(selected));
+                            await this.saveAndApplySettings();
+                        }
+                    );
+                    modal.open();
+                });
         });
     }
 

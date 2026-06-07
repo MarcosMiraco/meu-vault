@@ -10,7 +10,7 @@ export class SettingsColoredStatus extends MyVaultSettingsBase {
     }
 
     renderStatusThemesSettings(containerEl: HTMLElement) {
-        const { groupItemsContainer } = this.generateSettingsGroup(containerEl, "Status Themes");
+        const { groupItemsContainer } = this.generateSettingsGroup(containerEl, "Themas de Status");
         new Setting(groupItemsContainer)
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.updateCssClassesOnStatusChange)
@@ -19,7 +19,7 @@ export class SettingsColoredStatus extends MyVaultSettingsBase {
                     await this.plugin.saveSettings();
                 })
             )
-            .setName("Update CSS Classes on Status Change");
+            .setName("Atualizar Classes CSS em Mudanças de Status");
     }
 
     saveAndApplySettings(): void { throw new Error("Method Not Implemented") }

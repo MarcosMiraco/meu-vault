@@ -67,40 +67,76 @@ Colore automaticamente as pastas no explorador de arquivos com base no prefixo d
 
 Ambos os modos são totalmente personalizáveis: é possível adicionar, remover, reordenar e alterar a cor de qualquer entrada diretamente no painel de configurações.
 
-#### Painel de configurações
+---
 
-- Alternar entre os modos **Enhanced** e **Legacy**
-- Cada entrada exibe a cor atual, com um dropdown para escolher da paleta completa ou um color picker para cor personalizada
-- Reordenar entradas com os botões ↑ ↓
-- Editar o prefixo da pasta inline com o botão ✏️
-- Remover qualquer entrada com o botão 🗑️
-- Adicionar novas entradas com o botão **+**
+### Customização Avançada de Pastas
+
+O plugin oferece uma interface nativa e rica dentro das configurações do Obsidian para que você tenha controle absoluto sobre a identidade visual do seu explorador de arquivos.
+
+#### Estilos Visuais Disponíveis
+
+**Modo Legado:**
+
+![Exemplo das pastas estilo legado](./docs/pastas-coloridas-legado.png)
+
+**Modo Aprimorado (Enhanced):**
+
+![Exemplo das pastas estilo aprimorado](./docs/pastas-coloridas-aprimorado.png)
+
+#### Recursos do Painel de Configurações
+
+* **Controle de Estados Granular:** Defina cores independentes para o texto e fundo da pasta em três estados diferentes: padrão, selecionada e ao passar o mouse (`mouse`).
+* **Herança Dinâmica:** Opção para alternar o comportamento de *Aplicar a subpastas* com apenas um clique.
+* **Seletor de Cores Inteligente:** Um modal dedicado com busca integrada para selecionar rapidamente entre as cores predefinidas do sistema ou definir uma cor totalmente customizada (`Custom`).
+
+![Configurações das pastas (modal)](./docs/settings-folders-colors-modal.png)
+
+* **Gerenciamento Ágil:**
+  * Alterne facilmente entre os modos **Enhanced** e **Legacy**.
+  * Reordene a prioridade das regras de prefixo usando as setas ↑ ↓.
+  * Edite os prefixos diretamente na linha (*inline*) com o botão ✏️.
+  * Remova ou adicione regras instantaneamente com os botões 🗑️ e **+**.
+
+![Configurações das pastas](./docs/settings-folders-colors.png)
 
 ---
 
-### Texto colorido
+### Texto Colorido
 
-Você pode usar também o colored-text:
+O plugin estende a estilização do Obsidian permitindo aplicar cores e efeitos diretamente no corpo do texto através da classe `colored-text`.
+
 | Variante | Descrição |
 |---|---|
-| `bold` | Para fazer o texto negrito |
-| `italic` | Para fazer o texto ficar italico |
-| `underline` | Para criar uma underline embaixo do texto |
-| `strikethrough` | Para riscar o texto |
-| `highlight` | Para destacar o texto também pode ser combinado com as cores `highlight-blue` por exemplo |
-| `grad` | Texto em gradiente da cor até seu complementar |
+| `bold` | Aplica o efeito de negrito ao texto |
+| `italic` | Aplica o efeito de itálico ao texto |
+| `underline` | Adiciona uma linha inferior (sublinhado) |
+| `strikethrough` | Adiciona uma linha sobre o texto (tachado) |
+| `grad` | Aplica um gradiente vertical da cor escolhida até seu tom complementar |
+| `horizontal` | Modifica o gradiente para a orientação horizontal (deve ser usado junto com `grad`) |
+| `highlight-[cor]` | Destaca o fundo do texto com a cor especificada (ex: `highlight-cyan`) |
 
 **Cores disponíveis:** `cyan` `blue` `purple` `indigo` `pink` `red` `orange` `yellow` `green` `teal` `sepia` `black` `white`
 
+#### Exemplos de Uso
+
 ```md
-<span class="colored-text orange grad">Seu texto aqui</span>
+<!-- Uso simples de cor -->
+O <span class="colored-text cyan">texto em ciano</span> destaca termos importantes.
+
+<!-- Combinação de estilo e gradiente horizontal -->
+Um exemplo de <span class="colored-text orange bold grad horizontal">gradiente horizontal em negrito</span>.
+
+<!-- Efeitos de formatação e destaque de fundo -->
+Podemos usar <span class="colored-text red bold strikethrough">texto tachado</span> ou um <span class="colored-text highlight-yellow">marca-texto amarelo</span> para revisão.
 ```
+
+---
 
 ### Status Themes
 
-O plugin monitora o frontmatter das suas notas em busca de qualquer propriedade que comece com `status`. Quando um nome de tema reconhecido é encontrado, ele é adicionado automaticamente ao `cssclasses` da nota — aplicando o tema visual correspondente no Obsidian. A classe é removida automaticamente quando o status deixa de corresponder.
+O plugin monitora o frontmatter das suas notas em busca de qualquer propriedade que comece com `status`. Quando um nome de tema reconhecido é encontrado, ele é adicionado automaticamente ao `cssclasses` da nota — aplicando o tema visual correspondente no Obsidian. A classe é removida de forma dinâmica assim que o status deixa de corresponder.
 
-Essa feature está em progreso, a parte de adicionar o cssclasses já está funcionando, mas os temas em si ainda não foram implementados.
+> ⚠️ **Nota:** Esta funcionalidade está em desenvolvimento. A injeção automática de classes no `cssclasses` já está totalmente operacional, mas os temas visuais específicos serão implementados nas próximas versões.
 
 ---
 
@@ -108,7 +144,7 @@ Essa feature está em progreso, a parte de adicionar o cssclasses já está func
 
 ### Manual
 
-1. Acesse a página de [Releases](../../releases) e baixe os arquivos da versão mais recente:
+1. Acesse a página de [Releases](https://github.com/MarcosMiraco/meu-vault/releases) e baixe os arquivos da versão mais recente:
    - `main.js`
    - `styles.css`
    - `manifest.json`
